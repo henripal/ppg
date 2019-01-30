@@ -132,16 +132,18 @@ async function startVideo() {
 async function monitorLoop(input) {
     if (landmarks) {
        var position = landmarks.positions[0]
+       console.log(position)
         
         const targetCanvas = await document.getElementById("screencapCanvas")
         const video = await document.getElementById('video')
         // const photo = await document.getElementById("photo")
         var targetContext = targetCanvas.getContext('2d');
-        targetCanvas.width = 30
-        targetCanvas.height = 30
+        var size = 60
+        targetCanvas.width = size
+        targetCanvas.height = size
         // canvas.width = video.offsetWidth
         // canvas.height = video.offsetHeight
-        targetContext.drawImage(video, position.x, position.y, 30, 30, 0, 0, 30, 30);
+        targetContext.drawImage(video, position.x, position.y, size, size, 0, 0, size, size);
         // var data = canvas.toDataURL('image/png');
         // photo.setAttribute('src', data);
         // context.fillStyle = "#AAA";
@@ -156,12 +158,15 @@ async function detectLoop(input) {
         .detectSingleFace(input)
         .withFaceLandmarks()
 
+
     if (!detectionsWithLandmarks) {
         setTimeout(() => detectLoop(input), 1000)
     }
 
 
-    const detectionsWithLandmarksForSize = await detectionsWithLandmarks.forSize(input.offsetWidth, input.offsetHeight)
+    const detectionsWithLandmarksForSize = await faceapi.resizeResults(detectionsWithLandmarks,
+        { width: input.offsetWidth, height: input.offsetHeight})
+
 
     const canvas = await document.getElementById('overlay')
     canvas.width = input.offsetWidth
